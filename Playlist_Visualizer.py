@@ -17,7 +17,7 @@ API_BASE_URL = 'https://api.spotify.com/v1/'
 
 @app.route('/')
 def index():
-    return "Welcome to my spotify app! <a href='/login'>Click here</a>"
+    return render_template("index.html")
 
 @app.route('/login')
 def login():
@@ -56,7 +56,34 @@ def callback():
         session['refresh_token'] = token_info['refresh_token']
         session['expires_at'] = datetime.now().timestamp() + token_info['expires_in']
         
-        return redirect('/playlists')
+        return redirect('/form')
+
+@app.route('/form')
+def form():
+    if 'access_token' not in session:
+        return redirect('/login')
+    
+    if datetime.now().timestamp() > session['expires_at']: 
+        return redirect('/refresh-token')
+    
+    headers = {
+        'Authorization': f"Bearer {session['access_token']}"
+    }
+    
+    response = requests.get(API_BASE_URL+"me/playlists", headers=headers)
+    data = response.json()
+    
+    user_playlists = []
+    
+    name_response = requests.get(API_BASE_URL+"me", headers=headers)
+    name_data = name_response.json()
+    user_name = name_data["display_name"]
+    
+    for i in data['items']:
+        if (i["owner"]["display_name"] == user_name):
+            user_playlists.append(i["name"].replace(" ","-"))
+    
+    return render_template("form.html",user_lists=user_playlists)
 
 def get_playlist_tracks(playlist_in):
     headers = {
@@ -81,22 +108,19 @@ def get_playlist_tracks(playlist_in):
     
     return playlist_tracks
 
-@app.route('/playlists')
+@app.route('/playlists', methods=['POST', 'GET'])
 def get_playlists():
-    if 'access_token' not in session:
-        return redirect('/login')
-    
-    if datetime.now().timestamp() > session['expires_at']: 
-        return redirect('/refresh-token')
-    
     headers = {
         'Authorization': f"Bearer {session['access_token']}"
     }
     
+    if request.method == "POST":
+        form_data = request.form
+        
     response = requests.get(API_BASE_URL+"me/playlists", headers=headers)
     data = response.json()
     
-    playlist_tracks = []
+    playlist_dict = {}
     
     name_response = requests.get(API_BASE_URL+"me", headers=headers)
     name_data = name_response.json()
@@ -104,10 +128,10 @@ def get_playlists():
     
     for i in data['items']:
         if (i["owner"]["display_name"] == user_name):
-            playlist_tracks.append(i["name"])
-            playlist_tracks.append(i["tracks"])
+            playlist_dict[i["name"]] = (i["tracks"])
     
-    return get_playlist_tracks(playlist_tracks[1]["href"])
+    playlist_choice = list(form_data.values())[0].replace("-"," ")
+    return get_playlist_tracks(list(playlist_dict.values())[list(playlist_dict.keys()).index(playlist_choice)]["href"])
 
 @app.route('/refresh-token')
 def refresh_token():
@@ -128,7 +152,7 @@ def refresh_token():
         session['access_token'] = new_token_info['access_token']
         session['expires_at'] = datetime.now().timestamp() + new_token_info['expires_in']
         
-        return redirect('/playlists')
+        return redirect('/form')
     
 if __name__== '__main__':
     app.run(host = '0.0.0.0', debug=True)

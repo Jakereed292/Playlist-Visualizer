@@ -78,12 +78,27 @@ def form():
     name_response = requests.get(API_BASE_URL+"me", headers=headers)
     name_data = name_response.json()
     user_name = name_data["display_name"]
+    playlist_name = ''
     
     for i in data['items']:
         if (i["owner"]["display_name"] == user_name):
-            user_playlists.append(i["name"].replace(" ","-"))
+            playlist_name = i['name'].replace('-','+')
+            playlist_name = playlist_name.replace(' ', '-')
+            user_playlists.append(playlist_name)
     
     return render_template("form.html",user_lists=user_playlists)
+
+def get_track_info(id_in):
+    id_url = "audio-features/" + id_in
+    
+    headers = {
+        'Authorization': f"Bearer {session['access_token']}"
+    }
+    
+    response = requests.get(API_BASE_URL + id_url, headers=headers)
+    data = response.json()
+    
+    return data
 
 def get_playlist_tracks(playlist_in):
     headers = {
@@ -96,7 +111,7 @@ def get_playlist_tracks(playlist_in):
     artist_name = ''
     track_id = ''
     
-    playlist_tracks = []
+    playlist_tracks = {}
     
     for i in data['items']:
         for x in i['track']['album']['artists']:
@@ -104,7 +119,9 @@ def get_playlist_tracks(playlist_in):
         track_name = i['track']['name']
         track_id = i['track']['id']
         
-        playlist_tracks.append(track_name+', '+artist_name+': '+track_id) 
+        track = track_name+', '+artist_name
+        
+        playlist_tracks[track] = get_track_info(track_id)
     
     return playlist_tracks
 
@@ -131,7 +148,11 @@ def get_playlists():
             playlist_dict[i["name"]] = (i["tracks"])
     
     playlist_choice = list(form_data.values())[0].replace("-"," ")
-    return get_playlist_tracks(list(playlist_dict.values())[list(playlist_dict.keys()).index(playlist_choice)]["href"])
+    playlist_choice = playlist_choice.replace('+','-')
+    
+    tracks = get_playlist_tracks(list(playlist_dict.values())[list(playlist_dict.keys()).index(playlist_choice)]["href"])
+    
+    return tracks
 
 @app.route('/refresh-token')
 def refresh_token():

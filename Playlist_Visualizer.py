@@ -70,7 +70,7 @@ def form():
         'Authorization': f"Bearer {session['access_token']}"
     }
     
-    response = requests.get(API_BASE_URL+"me/playlists", headers=headers)
+    response = requests.get(API_BASE_URL+"me/playlists?limit=50", headers=headers)
     data = response.json()
     
     user_playlists = []
@@ -117,7 +117,7 @@ def get_playlists():
     if request.method == "POST":
         form_data = request.form
         
-    response = requests.get(API_BASE_URL+"me/playlists", headers=headers)
+    response = requests.get(API_BASE_URL+"me/playlists?limit=50", headers=headers)
     data = response.json()
     
     playlist_dict = {}

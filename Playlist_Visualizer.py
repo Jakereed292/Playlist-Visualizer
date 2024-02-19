@@ -1,5 +1,12 @@
 import requests
 import urllib.parse
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+import base64
+from io import StringIO
+
+sns.set_theme(style="whitegrid")
 
 from datetime import datetime
 from flask import Flask, jsonify, redirect, render_template, request, session
@@ -113,6 +120,14 @@ def get_playlist_tracks(playlist_in):
     
     playlist_tracks = {}
     
+    playlist_attr = {}
+    acousticness = []
+    danceability = []
+    energy = []
+    liveness = []
+    speechiness = []
+    valence = []
+    
     for i in data['items']:
         for x in i['track']['album']['artists']:
             artist_name = x['name']
@@ -121,9 +136,24 @@ def get_playlist_tracks(playlist_in):
         
         track = track_name+', '+artist_name
         
-        playlist_tracks[track] = get_track_info(track_id)
+        acousticness.append(get_track_info(track_id)["acousticness"])
+        danceability.append(get_track_info(track_id)["danceability"])
+        energy.append(get_track_info(track_id)["energy"])
+        liveness.append(get_track_info(track_id)["liveness"])
+        speechiness.append(get_track_info(track_id)["speechiness"])
+        valence.append(get_track_info(track_id)["valence"])
     
-    return playlist_tracks
+    playlist_attr["acousticness"] = acousticness
+    playlist_attr["danceability"] = danceability
+    playlist_attr["energy"] = energy
+    playlist_attr["liveness"] = liveness
+    playlist_attr["speechiness"] = speechiness
+    playlist_attr["valence"] = valence
+    
+    labels = list(playlist_attr.keys())
+    values = list(playlist_attr.values())
+    
+    return render_template('data.html', labels=labels, values=values)
 
 @app.route('/playlists', methods=['POST', 'GET'])
 def get_playlists():

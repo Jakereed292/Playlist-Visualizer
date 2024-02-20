@@ -2,6 +2,9 @@ import requests
 import urllib.parse
 import seaborn as sns
 import matplotlib.pyplot as plt
+from bokeh.plotting import figure, show
+from bokeh.layouts import column
+from bokeh.transform import jitter
 
 import base64
 from io import StringIO
@@ -14,8 +17,8 @@ from flask import Flask, jsonify, redirect, render_template, request, session
 app = Flask(__name__)
 app.secret_key = "12135744328"
 
-CLIENT_ID = '161d6adcd8e14ce3947052003dee3d34'
-CLIENT_SECRET = '2195bc23706244d58adfe05fc7f8e98b'
+CLIENT_ID = 'fc787b4e7c4b4b159d5f2b68d962ea46'
+CLIENT_SECRET = '0d1bc7338b82416b97837b7ca998ef0b'
 REDIRECT_URI = 'http://localhost:5000/callback'
 
 AUTH_URL = 'https://accounts.spotify.com/authorize'
@@ -95,17 +98,25 @@ def form():
     
     return render_template("form.html",user_lists=user_playlists)
 
-def get_track_info(id_in):
-    id_url = "audio-features/" + id_in
-    
+def get_tracks_info(ids_in):
+    id_url = "audio-features?ids="
+        
+    for i in range(len(ids_in)):
+        if(i == 0):
+            id_url = id_url +  ids_in[i]
+        else:
+            id_url = id_url + "%2C" + ids_in[i]
+        
     headers = {
         'Authorization': f"Bearer {session['access_token']}"
     }
     
     response = requests.get(API_BASE_URL + id_url, headers=headers)
     data = response.json()
-    
+
     return data
+
+
 
 def get_playlist_tracks(playlist_in):
     headers = {
@@ -114,11 +125,7 @@ def get_playlist_tracks(playlist_in):
     response = requests.get(playlist_in, headers=headers)
     data = response.json()
     
-    track_name = ''
-    artist_name = ''
-    track_id = ''
-    
-    playlist_tracks = {}
+    track_ids = []
     
     playlist_attr = {}
     acousticness = []
@@ -129,31 +136,43 @@ def get_playlist_tracks(playlist_in):
     valence = []
     
     for i in data['items']:
-        for x in i['track']['album']['artists']:
-            artist_name = x['name']
-        track_name = i['track']['name']
-        track_id = i['track']['id']
-        
-        track = track_name+', '+artist_name
-        
-        acousticness.append(get_track_info(track_id)["acousticness"])
-        danceability.append(get_track_info(track_id)["danceability"])
-        energy.append(get_track_info(track_id)["energy"])
-        liveness.append(get_track_info(track_id)["liveness"])
-        speechiness.append(get_track_info(track_id)["speechiness"])
-        valence.append(get_track_info(track_id)["valence"])
+        track_ids.append(i['track']['id'])
     
+    audio_features = get_tracks_info(track_ids)
+    
+    for x in range(len(audio_features["audio_features"])):
+        acousticness.append(audio_features["audio_features"][x]["acousticness"])
+        danceability.append(audio_features["audio_features"][x]["danceability"])
+        energy.append(audio_features["audio_features"][x]["energy"])
+        liveness.append(audio_features["audio_features"][x]["liveness"])
+        speechiness.append(audio_features["audio_features"][x]["speechiness"])
+        valence.append(audio_features["audio_features"][x]["valence"])
+        
     playlist_attr["acousticness"] = acousticness
     playlist_attr["danceability"] = danceability
     playlist_attr["energy"] = energy
     playlist_attr["liveness"] = liveness
     playlist_attr["speechiness"] = speechiness
     playlist_attr["valence"] = valence
+   
+    #plt.figure(0)
+    #sns.violinplot(data=playlist_attr)
+    
+    #attr = 1
+    #for attr in range(len(playlist_attr)+1):
+    #    plt.figure(attr)
+    #    sns.stripplot(data=list(playlist_attr.values())[attr-1])
+    #plt.show()
+    
+    #p = figure(width=600, height=300, y_range=list(playlist_attr.keys()))
+    #p.scatter(x="acousticness", y=list(playlist_attr.values())[0])
+    #show(p)
     
     labels = list(playlist_attr.keys())
-    values = list(playlist_attr.values())
+    a_values = list(playlist_attr.values())[0]
+    d_values = list(playlist_attr.values())[0]
     
-    return render_template('data.html', labels=labels, values=values)
+    return render_template("data.html", acousticness=acousticness, danceability=danceability, energy=energy, liveness=liveness, speechiness=speechiness, valence=valence)
 
 @app.route('/playlists', methods=['POST', 'GET'])
 def get_playlists():

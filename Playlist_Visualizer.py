@@ -126,6 +126,7 @@ def get_playlist_tracks(playlist_in):
     data = response.json()
     
     track_ids = []
+    tracks_with_ids = {}
     
     playlist_attr = {}
     acousticness = []
@@ -136,17 +137,22 @@ def get_playlist_tracks(playlist_in):
     valence = []
     
     for i in data['items']:
+        for x in i['track']['album']['artists']:
+            artist_name = x['name']
+        track_name = i['track']['name']
+        track = track_name+", "+artist_name
+        tracks_with_ids[track] = i['track']['id']
         track_ids.append(i['track']['id'])
     
     audio_features = get_tracks_info(track_ids)
-    
+
     for x in range(len(audio_features["audio_features"])):
-        acousticness.append(audio_features["audio_features"][x]["acousticness"])
-        danceability.append(audio_features["audio_features"][x]["danceability"])
-        energy.append(audio_features["audio_features"][x]["energy"])
-        liveness.append(audio_features["audio_features"][x]["liveness"])
-        speechiness.append(audio_features["audio_features"][x]["speechiness"])
-        valence.append(audio_features["audio_features"][x]["valence"])
+        acousticness.append((audio_features["audio_features"][x]["acousticness"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
+        danceability.append((audio_features["audio_features"][x]["danceability"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
+        energy.append((audio_features["audio_features"][x]["energy"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
+        liveness.append((audio_features["audio_features"][x]["liveness"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
+        speechiness.append((audio_features["audio_features"][x]["speechiness"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
+        valence.append((audio_features["audio_features"][x]["valence"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
         
     playlist_attr["acousticness"] = acousticness
     playlist_attr["danceability"] = danceability
@@ -154,26 +160,9 @@ def get_playlist_tracks(playlist_in):
     playlist_attr["liveness"] = liveness
     playlist_attr["speechiness"] = speechiness
     playlist_attr["valence"] = valence
-   
-    #plt.figure(0)
-    #sns.violinplot(data=playlist_attr)
-    
-    #attr = 1
-    #for attr in range(len(playlist_attr)+1):
-    #    plt.figure(attr)
-    #    sns.stripplot(data=list(playlist_attr.values())[attr-1])
-    #plt.show()
-    
-    #p = figure(width=600, height=300, y_range=list(playlist_attr.keys()))
-    #p.scatter(x="acousticness", y=list(playlist_attr.values())[0])
-    #show(p)
-    
-    labels = list(playlist_attr.keys())
-    a_values = list(playlist_attr.values())[0]
-    d_values = list(playlist_attr.values())[0]
-    
-    return render_template("data.html", acousticness=acousticness, danceability=danceability, energy=energy, liveness=liveness, speechiness=speechiness, valence=valence)
 
+    return render_template("data.html", acousticness=acousticness, danceability=danceability, energy=energy, liveness=liveness, speechiness=speechiness, valence=valence)
+    
 @app.route('/playlists', methods=['POST', 'GET'])
 def get_playlists():
     headers = {

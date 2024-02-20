@@ -7,78 +7,78 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <canvas id="bubbleChart" width="900" height="400"></canvas>
+    <canvas id="bubbleChart" width="1000" height="600"></canvas>
     <script>
         const graphLabels = ['acousticness', 'danceability', 'energy', 'liveness', 'speechiness', 'valence']
         var ctx = document.getElementById("bubbleChart").getContext("2d")
         var bubbleChart = new Chart(ctx, {
             type: "bubble",
             data: {
-                labels: graphLabels,
+                title: "Playlist Attributes",
                 datasets: [{
                             label: "acousticness",
                             data: [
                                 {% for attr in acousticness %}
-                                    {x:'acousticness', y: {{attr}} },
+                                    {x:'acousticness', y: {{attr[0]}}, r: 5, track: "{{attr[1]}}"},
                                 {% endfor %}
                             ],
                             fill: false,
-                            borderColor: "rgb(75, 192, 192)",
+                            borderColor: "#390099",
                             lineTension: 0.1           
-                    },
+                        },
                         {
                             label: "danceability",
                             data: [
                                 {% for attr in danceability %}
-                                    {x:'danceability', y: {{attr}} },
+                                    {x:'danceability', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
                                 {% endfor %}
                             ],
                             fill: false,
-                            borderColor: "rgb(75, 192, 192)",
+                            borderColor: "#9E0059",
                             lineTension: 0.1           
-                    },
+                        },
                         {
                             label: "energy",
                             data: [
                                 {% for attr in energy %}
-                                    {x:'energy', y: {{attr}} },
+                                    {x:'energy', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
                                 {% endfor %}
                             ],
                             fill: false,
-                            borderColor: "rgb(75, 192, 192)",
+                            borderColor: "#FF0054",
                             lineTension: 0.1           
-                    },
+                        },
                         {
                             label: "liveness",
                             data: [
                                 {% for attr in liveness %}
-                                    {x:'liveness', y: {{attr}} },
+                                    {x:'liveness', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
                                 {% endfor %}
                             ],
                             fill: false,
-                            borderColor: "rgb(75, 192, 192)",
+                            borderColor: "#FF5400",
                             lineTension: 0.1           
-                    },
+                        },
                         {
                             label: "speechiness",
                             data: [
                                 {% for attr in speechiness %}
-                                    {x:'speechiness', y: {{attr}} },
+                                    {x:'speechiness', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
                                 {% endfor %}
                             ],
                             fill: false,
-                            borderColor: "rgb(75, 192, 192)",
+                            borderColor: "#FFBD00",
                             lineTension: 0.1           
-                    },
+                        },
                         {
                             label: "valence",
                             data: [
                                 {% for attr in valence %}
-                                    {x:'valence', y: {{attr}} },
+                                    {x:'valence', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
                                 {% endfor %}
                             ],
                             fill: false,
-                            borderColor: "rgb(75, 192, 192)",
+                            borderColor: "#8ABD13",
                             lineTension: 0.1           
                     }
                 ]
@@ -89,6 +89,16 @@
                     x: {
                         type:'category',
                         labels: graphLabels
+                    }
+                },
+                plugins: {
+                    tootip: {
+                        callbacks: {
+                            label: (context) => {
+                                console.log(context);
+                                return `${context.raw.track}, Value: ${context.raw.y}`;
+                            }
+                        }
                     }
                 }
             }

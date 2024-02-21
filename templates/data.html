@@ -84,21 +84,21 @@
                 ]
             },
             options:{
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                console.log(context);
+                                return `${context.raw.track}, Value: ${context.raw.y}`
+                            }
+                        }
+                    }
+                },
                 responsive: false,
                 scales: {
                     x: {
                         type:'category',
                         labels: graphLabels
-                    }
-                },
-                plugins: {
-                    tootip: {
-                        callbacks: {
-                            label: (context) => {
-                                console.log(context);
-                                return `${context.raw.track}, Value: ${context.raw.y}`;
-                            }
-                        }
                     }
                 }
             }

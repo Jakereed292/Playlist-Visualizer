@@ -4,17 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enter Your Playlist</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
 </head>
 <body>
     <form action="/playlists" method = "POST">
-        <h1>Which playlist would you like to visualize?</h1>
-        <select name="playlists" id="playlists">
-            {% for playlist in user_lists %}
-            <option value={{playlist}}>{{playlist}}</option>
+        <h1>Please select one of your playlists:</h1>
+            {% for i in user_lists %}
+                {% if loop.index != playlist_len %}
+                    <label class="labl">
+                        <input type="radio" id="{{user_lists[loop.index]}}" name="playlist_choice" value="{{user_lists[loop.index]}}" class="playlist_choice" required>
+                        <div class="playlist">
+                            <img src="{{playlist_images[loop.index]}}" alt="Playlist Image" class="playlist_img">
+                            <div class="title">
+                                <label class="labl" for="{{user_lists[loop.index]}}">{{user_lists[loop.index]}}</label><br>
+                            </div>
+                        </div>
+                        <input type="submit" class="playlist_button" value="Visualize This Playlist">                       
+                    </label>
+                {% endif %}
             {% endfor %}
-        </select>
-
-        <input type="submit" class="button" value="Visualize Playlist">
     </form>
 
 </body>

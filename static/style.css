@@ -1,0 +1,108 @@
+* {
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+h1 {
+    text-align: center;
+    font-weight: 700;
+}
+
+canvas {
+    display: block;
+    margin: auto;
+}
+
+input.button {
+    display: block;
+    margin: auto;
+    width: 10%;
+    cursor: pointer;
+}
+
+select {
+    display: block;
+    margin: auto;
+    width: 15%;
+}
+
+img.playlist_img {
+    height: 200px;
+    width: 200px;
+    object-fit: cover;
+    position: relative;
+    border: 2px solid black;
+    border-radius: 25px;
+}
+
+.playlist_button {
+    display: none;
+    position: relative;
+    z-index: -1;
+    height: 100px;
+    width: 10%;
+    border-radius: 25px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.playlist_button:hover {
+    background-color: #d8e7ec;   
+}
+
+
+div.playlist {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25%;
+    border: 3px solid black;
+    border-radius: 20px;
+}
+
+div.title {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 50px;
+    font-weight: 700;
+    position: relative;
+    overflow-wrap: break-word;
+    cursor: pointer;
+}
+
+.labl {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.labl > input.playlist_choice{ 
+    visibility: hidden; 
+    position: absolute;
+}
+
+.labl > input.playlist_choice + div.playlist{
+    display: block;
+    padding: 20px;
+    margin: 30px;
+    width: 35%;
+    border: 3px solid black;
+    border-radius: 20px;
+    cursor:pointer;
+}
+
+.labl > input.playlist_choice:checked + div{ 
+    background-color: #c1dfeb;
+}
+
+@keyframes button_appear {
+    0% {left: -150px; z-index: -1;}
+    50% {left: 0px; z-index: -1;}
+    100% {left: 0px; z-index: +1;}
+}
+
+.labl > input.playlist_choice:checked ~ input.playlist_button{ 
+    display: block;
+    animation-name: button_appear;
+    animation-duration: 1.5s;
+    animation-fill-mode: forwards;
+}

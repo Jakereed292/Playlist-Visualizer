@@ -1,15 +1,5 @@
 import requests
 import urllib.parse
-import seaborn as sns
-import matplotlib.pyplot as plt
-from bokeh.plotting import figure, show
-from bokeh.layouts import column
-from bokeh.transform import jitter
-
-import base64
-from io import StringIO
-
-sns.set_theme(style="whitegrid")
 
 from datetime import datetime
 from flask import Flask, jsonify, redirect, render_template, request, session
@@ -84,6 +74,7 @@ def form():
     data = response.json()
     
     user_playlists = []
+    playlist_images = []
     
     name_response = requests.get(API_BASE_URL+"me", headers=headers)
     name_data = name_response.json()
@@ -95,8 +86,16 @@ def form():
             playlist_name = i['name'].replace('-','+')
             playlist_name = playlist_name.replace(' ', '-')
             user_playlists.append(playlist_name)
+            playlist_images.append([i['images'][0]['url']])
     
-    return render_template("form.html",user_lists=user_playlists)
+    return_playlist_images = []
+    
+    for x in range(len(playlist_images)):
+        return_playlist_images.append((playlist_images[x][0]))
+        
+    playlist_len = len(return_playlist_images)
+    
+    return render_template("form.html", playlist_len=playlist_len, user_lists=user_playlists, playlist_images=return_playlist_images)
 
 def get_tracks_info(ids_in):
     id_url = "audio-features?ids="
@@ -115,8 +114,6 @@ def get_tracks_info(ids_in):
     data = response.json()
 
     return data
-
-
 
 def get_playlist_tracks(playlist_in):
     headers = {

@@ -4,22 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playlist Data</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <canvas id="bubbleChart" width="1000" height="600"></canvas>
     <script>
-        const graphLabels = ['acousticness', 'danceability', 'energy', 'liveness', 'speechiness', 'valence']
+        const graphLabels = ['Acousticness', 'Danceability', 'Energy', 'Liveness', 'Speechiness', 'Valence']
         var ctx = document.getElementById("bubbleChart").getContext("2d")
         var bubbleChart = new Chart(ctx, {
             type: "bubble",
             data: {
                 title: "Playlist Attributes",
                 datasets: [{
-                            label: "acousticness",
+                            label: "Acousticness",
                             data: [
                                 {% for attr in acousticness %}
-                                    {x:'acousticness', y: {{attr[0]}}, r: 5, track: "{{attr[1]}}"},
+                                    {x:'Acousticness', y: {{attr[0]}}, r: 5, track: "{{attr[1]}}"},
                                 {% endfor %}
                             ],
                             fill: false,
@@ -27,10 +28,10 @@
                             lineTension: 0.1           
                         },
                         {
-                            label: "danceability",
+                            label: "Danceability",
                             data: [
                                 {% for attr in danceability %}
-                                    {x:'danceability', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
+                                    {x:'Danceability', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
                                 {% endfor %}
                             ],
                             fill: false,
@@ -38,10 +39,10 @@
                             lineTension: 0.1           
                         },
                         {
-                            label: "energy",
+                            label: "Energy",
                             data: [
                                 {% for attr in energy %}
-                                    {x:'energy', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
+                                    {x:'Energy', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
                                 {% endfor %}
                             ],
                             fill: false,
@@ -49,10 +50,10 @@
                             lineTension: 0.1           
                         },
                         {
-                            label: "liveness",
+                            label: "Liveness",
                             data: [
                                 {% for attr in liveness %}
-                                    {x:'liveness', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
+                                    {x:'Liveness', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
                                 {% endfor %}
                             ],
                             fill: false,
@@ -60,10 +61,10 @@
                             lineTension: 0.1           
                         },
                         {
-                            label: "speechiness",
+                            label: "Speechiness",
                             data: [
                                 {% for attr in speechiness %}
-                                    {x:'speechiness', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
+                                    {x:'Speechiness', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
                                 {% endfor %}
                             ],
                             fill: false,
@@ -71,10 +72,10 @@
                             lineTension: 0.1           
                         },
                         {
-                            label: "valence",
+                            label: "Valence",
                             data: [
                                 {% for attr in valence %}
-                                    {x:'valence', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
+                                    {x:'Valence', y: {{attr[0]}}, r:5, track: "{{attr[1]}}"},
                                 {% endfor %}
                             ],
                             fill: false,

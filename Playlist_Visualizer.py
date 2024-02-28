@@ -83,8 +83,7 @@ def form():
     
     for i in data['items']:
         if (i["owner"]["display_name"] == user_name):
-            playlist_name = i['name'].replace('-','+')
-            playlist_name = playlist_name.replace(' ', '-')
+            playlist_name = i['name']
             user_playlists.append(playlist_name)
             playlist_images.append([i['images'][0]['url']])
     
@@ -99,21 +98,23 @@ def form():
 
 def get_tracks_info(ids_in):
     id_url = "audio-features?ids="
-        
+            
     for i in range(len(ids_in)):
         if(i == 0):
             id_url = id_url +  ids_in[i]
         else:
             id_url = id_url + "%2C" + ids_in[i]
-        
+            
     headers = {
         'Authorization': f"Bearer {session['access_token']}"
     }
-    
+        
     response = requests.get(API_BASE_URL + id_url, headers=headers)
     data = response.json()
-
+    
+    print(data)
     return data
+
 
 def get_playlist_tracks(playlist_in):
     headers = {
@@ -125,7 +126,6 @@ def get_playlist_tracks(playlist_in):
     track_ids = []
     tracks_with_ids = {}
     
-    playlist_attr = {}
     acousticness = []
     danceability = []
     energy = []
@@ -143,20 +143,16 @@ def get_playlist_tracks(playlist_in):
     
     audio_features = get_tracks_info(track_ids)
 
-    for x in range(len(audio_features["audio_features"])):
-        acousticness.append((audio_features["audio_features"][x]["acousticness"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
-        danceability.append((audio_features["audio_features"][x]["danceability"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
-        energy.append((audio_features["audio_features"][x]["energy"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
-        liveness.append((audio_features["audio_features"][x]["liveness"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
-        speechiness.append((audio_features["audio_features"][x]["speechiness"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
-        valence.append((audio_features["audio_features"][x]["valence"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
-        
-    playlist_attr["acousticness"] = acousticness
-    playlist_attr["danceability"] = danceability
-    playlist_attr["energy"] = energy
-    playlist_attr["liveness"] = liveness
-    playlist_attr["speechiness"] = speechiness
-    playlist_attr["valence"] = valence
+    try:
+        for x in range(len(audio_features["audio_features"])):
+            acousticness.append((audio_features["audio_features"][x]["acousticness"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
+            danceability.append((audio_features["audio_features"][x]["danceability"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
+            energy.append((audio_features["audio_features"][x]["energy"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
+            liveness.append((audio_features["audio_features"][x]["liveness"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
+            speechiness.append((audio_features["audio_features"][x]["speechiness"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])]))
+            valence.append((audio_features["audio_features"][x]["valence"], list(tracks_with_ids.keys())[list(tracks_with_ids.values()).index(audio_features["audio_features"][x]["id"])])) 
+    except ValueError:
+        return render_template("error.html")
 
     return render_template("data.html", acousticness=acousticness, danceability=danceability, energy=energy, liveness=liveness, speechiness=speechiness, valence=valence)
     
@@ -182,8 +178,7 @@ def get_playlists():
         if (i["owner"]["display_name"] == user_name):
             playlist_dict[i["name"]] = (i["tracks"])
     
-    playlist_choice = list(form_data.values())[0].replace("-"," ")
-    playlist_choice = playlist_choice.replace('+','-')
+    playlist_choice = list(form_data.values())[0]
     
     tracks = get_playlist_tracks(list(playlist_dict.values())[list(playlist_dict.keys()).index(playlist_choice)]["href"])
     

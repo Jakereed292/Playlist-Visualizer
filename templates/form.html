@@ -4,23 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enter Your Playlist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+    <script defer src="{{ url_for('static', filename='apps.js')}}"></script>
 </head>
 <body>
     <form action="/playlists" method = "POST">
         <h1>Please select one of your playlists:</h1>
             {% for i in user_lists %}
                 {% if loop.index != playlist_len %}
-                    <label class="labl">
-                        <input type="radio" id="{{user_lists[loop.index]}}" name="playlist_choice" value="{{user_lists[loop.index]}}" class="playlist_choice" required>
-                        <div class="playlist">
-                            <img src="{{playlist_images[loop.index]}}" alt="Playlist Image" class="playlist_img">
-                            <div class="title">
-                                <label class="labl" for="{{user_lists[loop.index]}}">{{user_lists[loop.index]}}</label><br>
+                    <div class="hidden">
+                        <label class="labl">
+                            <input type="radio" id="{{user_lists[loop.index]}}" name="playlist_choice" value="{{user_lists[loop.index]}}" class="playlist_choice" required>
+                            <div class="playlist">
+                                <img src="{{playlist_images[loop.index]}}" alt="Playlist Image" class="playlist_img">
+                                <div class="title">
+                                    <label class="labl" for="{{user_lists[loop.index]}}">{{user_lists[loop.index]}}</label><br>
+                                </div>
                             </div>
-                        </div>
-                        <input type="submit" class="playlist_button" value="Visualize This Playlist">                       
-                    </label>
+                            <input type="submit" class="playlist_button" value="Visualize This Playlist">                       
+                        </label>
+                    </div>
                 {% endif %}
             {% endfor %}
     </form>

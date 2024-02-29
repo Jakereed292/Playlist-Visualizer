@@ -144,3 +144,14 @@ div.title {
     filter: blur(0);
     transform: translateX(0);
 }
+
+.bg-img {
+    position: absolute; 
+    height: 100%; 
+    width: 100%; 
+    background-image: url(/static/img/graph.JPG); 
+    background-size: cover; 
+    background-position: center; 
+    filter: blur(5px); 
+    z-index: -1; 
+}
